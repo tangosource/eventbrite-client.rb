@@ -1,7 +1,7 @@
 require 'httparty'
 class EventbriteClient
   include HTTParty
-  base_uri 'https://www.eventbrite.com'
+  base_uri 'http://www.eventbrite.com'
 
   def initialize( auth_tokens )
     @auth = {}

@@ -20,7 +20,7 @@ class EventbriteClient
           @auth = {:app_key => auth_tokens[:app_key], :user => auth_tokens[:user], :password => auth_tokens[:password]}
         else
           # read-only access to public data
-          @auth = {app_key: auth_tokens[:app_key]}
+          @auth = {:app_key => auth_tokens[:app_key]}
         end
       end 
     end

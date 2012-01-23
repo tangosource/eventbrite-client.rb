@@ -4,6 +4,7 @@ class EventbriteClient
   base_uri 'https://www.eventbrite.com'
 
   def initialize( auth_tokens )
+    @ruby_version_greater = RUBY_VERSION > '1.8.7'
     @auth = {}
     @data_type = 'json'
     if auth_tokens.is_a? Hash
@@ -14,10 +15,10 @@ class EventbriteClient
         #use api_key OR api_key + user_key OR api_key+email+pass
         if auth_tokens.include? :user_key
           # read/write access on the user account associated with :user_key
-          @auth = {app_key: auth_tokens[:app_key], user_key: auth_tokens[:user_key]}
+          @auth = @ruby_version_greater ? {app_key: auth_tokens[:app_key], user_key: auth_tokens[:user_key]} : {:app_key => auth_tokens[:app_key], :user_key => auth_tokens[:user_key]}
         elsif auth_tokens.include?(:user) && auth_tokens.include?(:password)
           # read/write access on the user account matching this login info 
-          @auth = {app_key: auth_tokens[:app_key], user: auth_tokens[:user], :password => auth_tokens[:password]}
+          @auth = @ruby_version_greater ? {app_key: auth_tokens[:app_key], user: auth_tokens[:user], :password => auth_tokens[:password]} : {:app_key => auth_tokens[:app_key], :user => auth_tokens[:user], :password => auth_tokens[:password]}
         else
           # read-only access to public data
           @auth = {app_key: auth_tokens[:app_key]}
@@ -31,7 +32,7 @@ class EventbriteClient
   def method_request( method, params )
     #merge auth params into our request querystring
     querystring = @auth.merge( params.is_a?(Hash) ? params : {} )
-    resp = self.class.get("/#{@data_type}/#{method.to_s}",{query: querystring})
+    resp = self.class.get("/#{@data_type}/#{method.to_s}",@ruby_version_greater ? {query: querystring} : {:query => querystring})
     if resp['error'] 
       raise RuntimeError, resp['error']['error_message'], caller[1..-1]
     end
